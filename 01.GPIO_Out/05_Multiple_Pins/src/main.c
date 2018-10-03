@@ -10,9 +10,14 @@ int main(void)
   MX_GPIO_Init();
   while (1)
   {
-	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,SET);  // Toggle PORTA Pin 5
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,SET);  // Set PORTA Pin 5
 	  delay();
-	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,RESET);  // Toggle PORTA Pin 5
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,RESET);  // Reset PORTA Pin 5
+      delay();
+       HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,SET);  // Set PORTA Pin 5
+	  delay();
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,RESET);  // Reset PORTA Pin 5
+      delay();
 
   }
 }
