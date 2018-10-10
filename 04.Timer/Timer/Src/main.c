@@ -1,52 +1,96 @@
-#include <stm32f4xx_hal.h>
+#include <stm32f4xx.h>
 
-void SysTick_Handler(void)
+
+void InitializeLEDs()
 {
-    HAL_IncTick();
-    HAL_SYSTICK_IRQHandler();
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+
+    GPIO_InitTypeDef gpioStructure;
+    gpioStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+    gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
+    gpioStructure.GPIO_Speed = GPIO_Speed_40MHz;
+    GPIO_Init(GPIOC, &gpioStructure);
+
+    GPIO_WriteBit(GPIOC, GPIO_Pin_2 | GPIO_Pin_3, Bit_RESET);
 }
 
-static TIM_HandleTypeDef htim2 = {
-    .Instance = TIM2
-};
-
-void InitializeTimer()
+void InitializeTimer2()
 {
-    __TIM2_CLK_ENABLE();
-    htim2.Init.Prescaler = 40000;
-    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 1000;
-    htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    htim2.Init.RepetitionCounter = 0;
-    HAL_TIM_Base_Init(&htim2);
-    HAL_TIM_Base_Start(&htim2);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+    TIM_TimeBaseInitTypeDef timerInitStructure;
+    timerInitStructure.TIM_Prescaler = 32000;
+    timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    timerInitStructure.TIM_Period = 9999;	//10-seconds
+    timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInit(TIM2, &timerInitStructure);
+    TIM_Cmd(TIM2, ENABLE);
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 }
 
-void InitializeLED()
+void InitializeTimer4()
 {
-    __GPIOB_CLK_ENABLE();
-    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
-    GPIO_InitStructure.Pin = GPIO_PIN_6;
-
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStructure.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+    TIM_TimeBaseInitTypeDef timerInitStructure;
+    timerInitStructure.TIM_Prescaler = 32000;
+    timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    timerInitStructure.TIM_Period = 59999;	//60-seconds
+    timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInit(TIM4, &timerInitStructure);
+    TIM_Cmd(TIM4, ENABLE);
+    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
 }
 
-int main(void)
+void EnableTimerInterrupt2()
 {
-    HAL_Init();
-    InitializeLED();
-    InitializeTimer();
+	NVIC_InitTypeDef nvicStructure;
+	nvicStructure.NVIC_IRQChannel = TIM2_IRQn;
+	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	nvicStructure.NVIC_IRQChannelSubPriority = 1;
+	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&nvicStructure);
+}
 
-    for (;;)
+void EnableTimerInterrupt4()
+{
+	NVIC_InitTypeDef nvicStructure;
+	nvicStructure.NVIC_IRQChannel = TIM4_IRQn;
+	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	nvicStructure.NVIC_IRQChannelSubPriority = 1;
+	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&nvicStructure);
+}
+
+
+int main()
+{
+    InitializeLEDs();
+    InitializeTimer2();
+    EnableTimerInterrupt2();
+    InitializeTimer4();
+    EnableTimerInterrupt4();
+
+    while(1)
     {
-        int timerValue = __HAL_TIM_GET_COUNTER(&htim2);
-        if (timerValue == 300)
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
-        if (timerValue == 800)
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+
     }
+}
+
+void TIM2_IRQHandler()
+{
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
+	{
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+		GPIO_ToggleBits(GPIOC, GPIO_Pin_2);
+	}
+}
+
+void TIM4_IRQHandler()
+{
+	if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+	{
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+		GPIO_ToggleBits(GPIOC, GPIO_Pin_3);
+	}
 }
