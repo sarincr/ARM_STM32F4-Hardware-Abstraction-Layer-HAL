@@ -33,10 +33,10 @@ endif
 all: 01.Blink_WriteBit.elf
 
 # Tool invocations
-01.Blink_WriteBit.elf: $(OBJS) $(USER_OBJS) /home/angicia/Work\ Lab/Workbench/01.Blink_WriteBit/LinkerScript.ld
+01.Blink_WriteBit.elf: $(OBJS) $(USER_OBJS) /home/angicia/Work\ Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "01.Blink_WriteBit.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "01.Blink_WriteBit.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

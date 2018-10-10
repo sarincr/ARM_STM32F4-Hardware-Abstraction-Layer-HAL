@@ -15,7 +15,7 @@ startup/%.o: ../startup/%.s
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Assembler'
 	@echo $(PWD)
-	arm-none-eabi-as -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/HAL_Driver/Inc/Legacy" -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/Utilities/STM32F4xx-Nucleo" -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/inc" -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/CMSIS/device" -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/CMSIS/core" -I"/home/angicia/Work Lab/Workbench/01.Blink_WriteBit/HAL_Driver/Inc" -g -o "$@" "$<"
+	arm-none-eabi-as -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/HAL_Driver/Inc/Legacy" -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/Utilities/STM32F4xx-Nucleo" -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/inc" -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/CMSIS/device" -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/CMSIS/core" -I"/home/angicia/Work Lab/Workbench/HAL/01.GPIO_Out/01.Blink_WriteBit/HAL_Driver/Inc" -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
