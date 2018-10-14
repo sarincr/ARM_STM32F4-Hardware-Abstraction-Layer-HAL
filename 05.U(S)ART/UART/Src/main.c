@@ -1,16 +1,9 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
-
-TIM_HandleTypeDef htim4;
-
 UART_HandleTypeDef huart2;
-
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_TIM4_Init(void);                                    
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-                                
 
 int main(void)
 {
@@ -21,19 +14,20 @@ int main(void)
 
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_TIM4_Init();
 
-  HAL_TIM_OC_Start(&htim4,TIM_CHANNEL_1);
+  char* txData="Hello\n";
+
+  __HAL_UART_ENABLE_IT(&huart2,UART_IT_TC);
+
   while (1)
   {
-
-
+	  HAL_UART_Transmit_IT(&huart2,(uint8_t *)txData,7);
+	  HAL_Delay(200);
   }
 }
 
 void SystemClock_Config(void)
 {
-
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
 
@@ -56,6 +50,7 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
@@ -68,57 +63,18 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-
 
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-static void MX_TIM4_Init(void)
-{
-
-  TIM_MasterConfigTypeDef sMasterConfig;
-  TIM_OC_InitTypeDef sConfigOC;
-
-  htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 16000;
-  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 4000;
-  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  if (HAL_TIM_OC_Init(&htim4) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  HAL_TIM_MspPostInit(&htim4);
-
-}
-
-/* USART2 init function */
 static void MX_USART2_UART_Init(void)
 {
 
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 9600;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -132,12 +88,10 @@ static void MX_USART2_UART_Init(void)
 
 }
 
-
 static void MX_GPIO_Init(void)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-
 
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -166,7 +120,6 @@ void _Error_Handler(char *file, int line)
   while(1)
   {
   }
-
 }
 
 #ifdef  USE_FULL_ASSERT
