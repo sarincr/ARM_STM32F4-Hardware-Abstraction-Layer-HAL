@@ -2,6 +2,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 
+ uint8_t Data[20];
 UART_HandleTypeDef huart2;
 
 void SystemClock_Config(void);
@@ -10,7 +11,7 @@ static void MX_USART2_UART_Init(void);
 
 int main(void)
 {
-  uint8_t Data[20];
+
 
   HAL_Init();
 
@@ -22,13 +23,25 @@ int main(void)
   __HAL_UART_ENABLE_IT(&huart2,UART_IT_TC);
   __HAL_UART_ENABLE_IT(&huart2,UART_IT_RXNE);
 
+
   while (1)
   {
-	  HAL_UART_Receive_IT(&huart2,Data,20);
-	  HAL_UART_Transmit_IT(&huart2,(uint8_t *)Data,20);
-	  HAL_Delay(1000);
+
+
   }
 
+}
+
+uint8_t Rx_data[5];
+uint32_t tx_timeout = 0;
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART2)  //current UART
+    {
+        HAL_UART_Transmit(&huart2, &Rx_data[0], 1, tx_timeout);
+        HAL_UART_Receive_IT(&huart2, Rx_data, 1);   //activate UART receive interrupt every time on receiving 1 byte
+    }
 }
 
 void SystemClock_Config(void)
@@ -139,7 +152,7 @@ void _Error_Handler(char *file, int line)
 #ifdef  USE_FULL_ASSERT
 
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
 
 }
 #endif
